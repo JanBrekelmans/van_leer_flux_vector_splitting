@@ -17,13 +17,13 @@ import riemann
 User-defined variables
 """
 # Number of volumes
-N = 100
+N = 40
 
 # Extending the grid to incorporate boundary conditions
 n_ex = 2
 
 # Which test we want to run
-sod_test_num = 1
+sod_test_num = 5
 
 # Courant Lax Friedrichs constant
 CLF = 0.25
@@ -39,7 +39,7 @@ phi = limiter.upwind
 fix_cavitation = False
 
 # Save figure on every timestep?
-save_fig = True
+save_fig = False
 save_location = r".\plots"
 plot_limits = initialization.sod_limits(sod_test_num)
 

@@ -10,36 +10,36 @@ import numpy as np
 gamma = 7/5
 
 def f_T(p,state):
-    rhoL = state[0]
-    uL = state[1]
-    pL = state[2]
+    rho_L = state[0]
+    u_L = state[1]
+    p_L = state[2]
     
-    aL = (gamma*pL/rhoL)**0.5
+    c_L = (gamma*p_L/rho_L)**0.5
     
-    AL = 2/((gamma+1)*rhoL)
-    BL = (gamma-1)/(gamma+1)*pL
+    AL = 2/((gamma+1)*rho_L)
+    BL = (gamma-1)/(gamma+1)*p_L
     
-    if p > pL:
-        val = (p-pL)*(AL/(p+BL))**0.5
+    if p > p_L:
+        val = (p-p_L)*(AL/(p+BL))**0.5
     else:
-        val = 2*aL/(gamma-1)*((p/pL)**((gamma-1)/2/gamma) - 1)
+        val = 2*c_L/(gamma-1)*((p/p_L)**((gamma-1)/2/gamma) - 1)
     
     return val
 
 def d_f_T(p,state):
-    rhoL = state[0]
-    uL = state[1]
-    pL = state[2]
+    rho_L = state[0]
+    u_L = state[1]
+    p_L = state[2]
     
-    aL = (gamma*pL/rhoL)**0.5
+    c_L = (gamma*p_L/rho_L)**0.5
     
-    AL = 2/((gamma+1)*rhoL)
-    BL = (gamma-1)/(gamma+1)*pL
+    AL = 2/((gamma+1)*rho_L)
+    BL = (gamma-1)/(gamma+1)*p_L
     
-    if p > pL:
-        val = (AL/(BL+p))**0.5*(1-(p-pL)/(2*(BL+p)))
+    if p > p_L:
+        val = (AL/(BL+p))**0.5*(1-(p-p_L)/(2*(BL+p)))
     else:
-        val = 1/(rhoL*aL)*(p/pL)**(-(gamma+1)/(2*gamma))
+        val = 1/(rho_L*c_L)*(p/p_L)**(-(gamma+1)/(2*gamma))
     
     return val
 
@@ -72,19 +72,19 @@ def calc_pressure(left_state,right_state,tol):
     return p
 
 def check_vacuum(left_state,right_state):
-    rhoL = left_state[0]
-    uL = left_state[1]
-    pL = left_state[2]
+    rho_L = left_state[0]
+    u_L = left_state[1]
+    p_L = left_state[2]
     
-    aL = (gamma*pL/rhoL)**0.5
+    c_L = (gamma*p_L/rho_L)**0.5
     
-    rhoR = right_state[0]
-    uR = right_state[1]
-    pR = right_state[2]
+    rho_R = right_state[0]
+    u_R = right_state[1]
+    p_R = right_state[2]
     
-    aR = (gamma*pL/rhoL)**0.5
+    c_R = (gamma*p_L/rho_L)**0.5
     
-    if 2*(aL+aR)/(gamma-1) <= uR-uL:
+    if 2*(c_L+c_R)/(gamma-1) <= u_R-u_L:
         raise Exception("Vacuum detected, aborting computation")
 
 class Riemann_Solution:
@@ -127,62 +127,62 @@ class Riemann_Solution:
     
     def determine_states(self):
         # Left structure
-        rhoL = self.left_state[0]
-        uL = self.left_state[1]
-        pL = self.left_state[2]
-        AL = 2/((gamma+1)*rhoL)
-        BL = (gamma-1)/(gamma+1)*pL
+        rho_L = self.left_state[0]
+        u_L = self.left_state[1]
+        p_L = self.left_state[2]
+        AL = 2/((gamma+1)*rho_L)
+        BL = (gamma-1)/(gamma+1)*p_L
         p_star = self.p_star
         u_star = self.u_star
         
         if self.left_structure == "Shock":
             QL = ((p_star + BL)/AL)**0.5
             
-            temp1 = p_star/pL + (gamma-1)/(gamma+1)
-            temp2 = (gamma-1)*p_star/((gamma+1)*pL) + 1
+            temp1 = p_star/p_L + (gamma-1)/(gamma+1)
+            temp2 = (gamma-1)*p_star/((gamma+1)*p_L) + 1
             
-            self.rho_starL = rhoL*temp1/temp2
-            self.SL = uL - QL/rhoL
+            self.rho_star_L = rho_L*temp1/temp2
+            self.SL = u_L - QL/rho_L
         else:
-            self.rho_starL = rhoL*(p_star/pL)**(1/gamma)
-            aL = (gamma*pL/rhoL)**0.5
-            a_starL = aL*(p_star/pL)**((gamma-1)/2/gamma)
-            self.SHL = uL - aL
-            self.STL = u_star - a_starL
+            self.rho_star_L = rho_L*(p_star/p_L)**(1/gamma)
+            c_L = (gamma*p_L/rho_L)**0.5
+            a_star_L = c_L*(p_star/p_L)**((gamma-1)/2/gamma)
+            self.SHL = u_L - c_L
+            self.STL = u_star - a_star_L
         
         # Right structure
-        rhoR = self.right_state[0]
-        uR = self.right_state[1]
-        pR = self.right_state[2]
-        AR = 2/((gamma+1)*rhoR)
-        BR = (gamma-1)/(gamma+1)*pR
+        rho_R = self.right_state[0]
+        u_R = self.right_state[1]
+        p_R = self.right_state[2]
+        AR = 2/((gamma+1)*rho_R)
+        BR = (gamma-1)/(gamma+1)*p_R
         
         if self.right_structure == "Shock":
             QR = ((p_star + BR)/AR)**0.5
             
-            temp1 = p_star/pR + (gamma-1)/(gamma+1)
-            temp2 = (gamma-1)*p_star/((gamma+1)*pR) + 1
+            temp1 = p_star/p_R + (gamma-1)/(gamma+1)
+            temp2 = (gamma-1)*p_star/((gamma+1)*p_R) + 1
             
-            self.rho_starR = rhoR*temp1/temp2
-            self.SR = uR + QR/rhoR
+            self.rho_star_R = rho_R*temp1/temp2
+            self.SR = u_R + QR/rho_R
         else:
-            self.rho_starR = rhoR*(p_star/pR)**(1/gamma)
-            aR = (gamma*pR/rhoR)**0.5
-            a_starR = aR*(p_star/pR)**((gamma-1)/2/gamma)
-            self.SHR = uR + aR
-            self.STR = u_star + a_starR
+            self.rho_star_R = rho_R*(p_star/p_R)**(1/gamma)
+            c_R = (gamma*p_R/rho_R)**0.5
+            c_star_R = c_R*(p_star/p_R)**((gamma-1)/2/gamma)
+            self.SHR = u_R + c_R
+            self.STR = u_star + c_star_R
             
 
     def solution(self,x,x0,time):
-        rhoL = self.left_state[0]
-        uL = self.left_state[1]
-        pL = self.left_state[2]
-        rhoR = self.right_state[0]
-        uR = self.right_state[1]
-        pR = self.right_state[2]
+        rho_L = self.left_state[0]
+        u_L = self.left_state[1]
+        p_L = self.left_state[2]
+        rho_R = self.right_state[0]
+        u_R = self.right_state[1]
+        p_R = self.right_state[2]
         
-        rho_starL = self.rho_starL
-        rho_starR = self.rho_starR
+        rho_star_L = self.rho_star_L
+        rho_star_R = self.rho_star_R
         u_star = self.u_star
         p_star = self.p_star
         
@@ -195,11 +195,11 @@ class Riemann_Solution:
             
             for i in range(n):
                 if x[i]-x0 <= SL*time:
-                    y[0,i] = rhoL
-                    y[1,i] = uL
-                    y[2,i] = pL
+                    y[0,i] = rho_L
+                    y[1,i] = u_L
+                    y[2,i] = p_L
                 elif x[i] - x0 <= u_star*time:
-                    y[0,i] = rho_starL
+                    y[0,i] = rho_star_L
                     y[1,i] = u_star
                     y[2,i] = p_star
                 else:
@@ -208,23 +208,23 @@ class Riemann_Solution:
         else:
             SHL = self.SHL
             STL = self.STL
-            aL = (gamma*pL/rhoL)**0.5
+            c_L = (gamma*p_L/rho_L)**0.5
             
             for i in range(n):
                 if x[i] - x0 <= SHL*time:
-                    y[0,i] = rhoL
-                    y[1,i] = uL
-                    y[2,i] = pL
+                    y[0,i] = rho_L
+                    y[1,i] = u_L
+                    y[2,i] = p_L
                 elif x[i] - x0 <= STL*time:
                     xt = (x[i]-x0)/time
-                    temp = 2/(gamma+1) + (gamma-1)/((gamma+1)*aL)*(uL-xt)
-                    y[0,i] = rhoL*temp**(2/(gamma-1))
-                    temp = aL + (gamma-1)/2*uL + xt
+                    temp = 2/(gamma+1) + (gamma-1)/((gamma+1)*c_L)*(u_L-xt)
+                    y[0,i] = rho_L*temp**(2/(gamma-1))
+                    temp = c_L + (gamma-1)/2*u_L + xt
                     y[1,i] = 2*temp/(gamma+1)
-                    temp = 2/(gamma+1) + (gamma-1)/((gamma+1)*aL)*(uL-xt)
-                    y[2,i] = pL*temp**(2*gamma/(gamma-1))
+                    temp = 2/(gamma+1) + (gamma-1)/((gamma+1)*c_L)*(u_L-xt)
+                    y[2,i] = p_L*temp**(2*gamma/(gamma-1))
                 elif x[i] - x0 <= u_star*time:
-                    y[0,i] = rho_starL
+                    y[0,i] = rho_star_L
                     y[1,i] = u_star
                     y[2,i] = p_star
                 else:
@@ -238,37 +238,37 @@ class Riemann_Solution:
             for i in range(n-nr):
                 i = i + nr
                 if x[i]-x0 <= SR*time:
-                    y[0,i] = rho_starR
+                    y[0,i] = rho_star_R
                     y[1,i] = u_star
                     y[2,i] = p_star
                 else:
-                    y[0,i] = rhoR
-                    y[1,i] = uR
-                    y[2,i] = pR
+                    y[0,i] = rho_R
+                    y[1,i] = u_R
+                    y[2,i] = p_R
         else:
             SHR = self.SHR
             STR = self.STR
-            aR = (gamma*pR/rhoR)**0.5
+            c_R = (gamma*p_R/rho_R)**0.5
             
             for i in range(n-nr):
                 i = i + nr
                 
                 if x[i]-x0 <= STR*time:
-                    y[0,i] = rho_starR
+                    y[0,i] = rho_star_R
                     y[1,i] = u_star
                     y[2,i] = p_star
                 elif x[i]-x0 <= SHR*time:
                     xt = (x[i]-x0)/time
-                    temp = 2/(gamma+1) - (gamma-1)/((gamma+1)*aR)*(uR-xt)
-                    y[0,i] = rhoR*temp**(2/(gamma-1))
-                    temp = -aR + (gamma-1)/2*uR + xt
+                    temp = 2/(gamma+1) - (gamma-1)/((gamma+1)*c_R)*(u_R-xt)
+                    y[0,i] = rho_R*temp**(2/(gamma-1))
+                    temp = -c_R + (gamma-1)/2*u_R + xt
                     y[1,i] = 2*temp/(gamma+1)
-                    temp = 2/(gamma+1) - (gamma-1)/((gamma+1)*aR)*(uR-xt)
-                    y[2,i] = pR*temp**(2*gamma/(gamma-1))
+                    temp = 2/(gamma+1) - (gamma-1)/((gamma+1)*c_R)*(u_R-xt)
+                    y[2,i] = p_R*temp**(2*gamma/(gamma-1))
                 else:
-                    y[0,i] = rhoR
-                    y[1,i] = uR
-                    y[2,i] = pR
+                    y[0,i] = rho_R
+                    y[1,i] = u_R
+                    y[2,i] = p_R
                     
             
         return y
